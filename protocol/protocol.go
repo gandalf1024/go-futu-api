@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"errors"
+	"github.com/gandalf1024/go-futu-api/log"
 	"io"
 	"net"
 	"reflect"
@@ -108,6 +109,7 @@ func (de *FutuDecoder) ReadFrom(c net.Conn) (tcp.Handler, error) {
 		}
 	}
 	//log.Printf("read: proto %v serial %v", h.ProtoID, h.SerialNo)
+	log.Infof("read: proto %v serial %v", h.ProtoID, h.SerialNo)
 	return &handler{
 		reg:    de.reg,
 		proto:  h.ProtoID,
@@ -126,13 +128,14 @@ type handler struct {
 var _ tcp.Handler = (*handler)(nil)
 
 func (h *handler) Handle() {
-	//log.Printf("handle: proto %v serial %v", h.proto, h.serial)
+	log.Infof("handle: proto %v serial %v", h.proto, h.serial)
 	if err := h.reg.handle(h.proto, h.serial, h.body); err != nil {
 		// todo 错误处理
 		//log.Println(err)
+		log.Error(err)
 		return
 	}
-	//log.Printf("finish: proto %v serial %v", h.proto, h.serial)
+	log.Infof("finish: proto %v serial %v", h.proto, h.serial)
 }
 
 type Response interface {
